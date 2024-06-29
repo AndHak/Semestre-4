@@ -8,15 +8,17 @@ def es_primo(num):
     return True
 
 def calcular_primo():
-    """Función principal para verificar números primos."""
-    primos = True
-    while primos:
+    """Función principal para verificar números primos y fibonaccis."""
+    numeros = True
+    while numeros:
         try:
-            primo = input("Digite un número o 'Q' para salir: ")
-            if primo.upper() == "Q":
-                primos = False
-            elif es_primo(int(primo)):
+            numero = input("Digite un número o 'Q' para salir: ")
+            if numero.upper() == "Q":
+                numeros = False
+            elif es_primo(int(numero)):
                 print("El número es primo.")
+            elif es_fibonacci(int(numero)):
+                print("Este numero es fibonacci")
             else:
                 print("Este número no es primo.")
         except ValueError:
