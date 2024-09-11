@@ -15,6 +15,18 @@ class Carro:
         self.marca = marca
         self.modelo = modelo
 
+    @property
+    def modelo(self):
+        return self.__modelo
+    
+    @modelo.setter
+    def modelo(self, year_model):
+        if year_model >= 2000:
+            self.__modelo = year_model
+        else:
+            raise Exception("No se puede agregar el carro")
+
+
     def __str__(self):
         return f"Placa: {self.placa}\nMarca: {self.marca}\nModelo: {self.modelo}\n"
     
@@ -24,13 +36,15 @@ class Carro:
 
 if __name__ == "__main__":
     lst_cars = Lista_SE()
-    car1 = Carro("QKJ 789", "Renault", 2010)
-    lst_cars.adicionar(car1)
-    car2 = Carro("AWX 456", "Mazda", 2005)
-    lst_cars.adicionar(car2)
-    car3 = Carro("RTY 159", "Toyota", 2018)
-    lst_cars.adicionar(car3)
+    try:
+        car1 = Carro("QKJ 789", "Renault", 1999)
+        lst_cars.adicionar(car1)
+        car1.modelo = 1999
+        car2 = Carro("AWX 456", "Mazda", 2005)
+        lst_cars.adicionar(car2)
+        car3 = Carro("RTY 159", "Toyota", 2018)
+        lst_cars.adicionar(car3)
+    except Exception as e:
+        print(e)
+
     lst_cars.recorrer()
-    print("Buscar el carro 1:", lst_cars.encontrar(car1))
-    print("Buscar el carro 1:", lst_cars.encontrar(car2))
-    print(car1 == car2)
