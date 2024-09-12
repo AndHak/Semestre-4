@@ -1,3 +1,6 @@
+# Andres Felipe Martinez Guerra | Código: 223034091
+# SEBASTIAN DAVID ORDOÑEZ BOLAÑOS (codigo: 223034072)
+
 from nodos import Nodo_listaSE
 
 class Lista_SE:
@@ -170,6 +173,23 @@ class Lista_SE:
     
     # (6.1) Método oculto remover por posición
     def __remover_pos(self, pos_elim):
+        """
+        Método oculto que permite remover un nodo de la lista de acuerdo a una posición
+        específica. Actualiza las referencias de los nodos para eliminar el nodo en la
+        posición indicada.
+
+        Parameters
+        ----------
+        pos_elim : int
+            La posición del nodo que se desea eliminar de la lista. Debe ser un valor
+            mayor o igual a 0.
+
+        Returns
+        -------
+        bool
+            True si se ha eliminado correctamente el nodo en la posición especificada.
+            False si la posición está fuera de rango o si no hay un nodo en dicha posición.
+        """
         actual = self.__cab
         indice = 0 
         anterior = None
@@ -240,28 +260,46 @@ class Lista_SE:
             actual = actual.sig
         return eliminado
 
+
     # (7) Método __str__
-    def __str__(self):
+    def __str__(self, reversed=False):
         """Método que devuelve una cadena con los datos de la lista, o una
-        cadena vacía en el caso de que la lista sea vacía.
+        cadena vacía en el caso de que la lista sea vacía. Si reversed=True,
+        retorna la lista en orden inverso.
+
+        Parameters
+        ----------
+        reversed : bool, optional
+            Si es True, la lista será representada en orden inverso.
 
         Returns
         -------
         str
             Si la lista no es vacía retornará una cadena en el formato:
                 "(dato_0) :>: (dato_1) :>: (dato_2) :>: ... :>: (dato_n)"
-                "(7) :>: (8) :>: (5) :>: (5) :>: (9)"
             de lo contrario retornará una cadena vacía: ""
         """
         if self.es_vacia():
             return ""
-        else:
-            actual = self.__cab
-            cadena = str(actual.dato)
-            while actual.sig:
-                actual = actual.sig
-                cadena += " :>: " + str(actual.dato)
-            return cadena
+
+        # Almacenar los nodos en una lista temporal
+        nodos = []
+        actual = self.__cab
+        while actual:
+            nodos.append(actual.dato)
+            actual = actual.sig
+
+        # Invertir la lista si reversed=True
+        if reversed:
+            nodos = nodos[::-1]
+
+        # Construir la cadena de salida
+        cadena = "(" + str(nodos[0]) + ")"
+        for dato in nodos[1:]:
+            cadena += " :>: " + "(" + str(dato) + ")"
+
+        return cadena
+
 
     # (8) Sobre-escritura del método __len__
     def __len__(self):

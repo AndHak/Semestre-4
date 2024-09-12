@@ -1,4 +1,4 @@
-from nodos import Nodo_listaSE
+from lse import Lista_SE
 
 class Estudiante:
     """La clase Estudiante implementa un estudiante que posee código, nombre
@@ -25,33 +25,32 @@ class Estudiante:
     @property
     def codigo(self):
         return self.__codigo
-    
+
     @codigo.setter
     def codigo(self, codigo):
-        numeros = "1234567890"
         if len(codigo) == 4:
-            if all(letter for letter in numeros):
+            if isinstance(codigo, str):
                 self.__codigo = codigo
             else:
-                raise Exception("El codigo deben ser numeros")
+                raise ValueError("El codigo deben ser numeros")
         else:
-            raise Exception("El codigo debe tener 4 digitos")
-        
+            raise ValueError("El codigo debe tener 4 digitos")
+
     @property
     def nota(self):
         return self.__nota
-    
+
     @nota.setter
     def nota(self, nota):
-        if isinstance(nota, int):
+        if isinstance(nota, float):
             if nota < 0.0 or nota > 5.0:
-                raise Exception("La nota no cumple el rango 0.0 - 5.0")
+                raise ValueError("La nota no cumple el rango 0.0 - 5.0")
             else:
-                self.__nota == nota
+                self.__nota = nota
         else:
-            raise Exception("La nota debe ser un numero")
+            raise ValueError("La nota debe ser un numero")
 
-        
+
 
     def __str__(self):
         """Método de presentación del Estudiante.
@@ -85,7 +84,7 @@ class Estudiante:
             True si los dos estudiantes son el mismo. False en caso
             contrario
         """
-        return self.codigo == otro_estudiante.codigos 
+        return self.codigo == otro_estudiante.codigos
 
 
 class Colegio:
@@ -102,7 +101,8 @@ class Colegio:
             nombre del colegio
         """
         self.nombre = nombre
-        self.__cab = None
+        self.lista = Lista_SE()
+
 
     def matricular(self, nuevo_est, becado=False, pos_beca=0):
         """Método que realiza la matrícula de nuevos estudiantes al colegio.
@@ -126,10 +126,20 @@ class Colegio:
         bool
             True si el estudiante es matriculado. False en caso contrario
         """
-        posicion = pos_beca
-        self.ubicar_estudiante(posicion)
-        
-    
+        if isinstance(becado, bool):
+            if isinstance(pos_beca, int):
+                if becado == False and pos_beca != 0:
+                    raise ValueError("Los no becados no pueden ser posicionados")
+                else:
+                    self.lista.posicionar(nuevo_est, pos_beca)
+                    return True
+            else:
+                raise ValueError("La posicion no es int")
+        else:
+            raise ValueError("becado debe ser bool")
+
+
+
     @property
 
     def expulsar(self, pos_est, por_estudiante=False):
@@ -150,13 +160,16 @@ class Colegio:
         bool
             True si el estudiante pudo ser expulsado. False en caso contrario
         """
-        pass
+        if len(self.lista) < pos_est:
+            raise ValueError("La posicion no existe")
+        else:
+            self.lista.__remover_dato(pos_est)
 
     def ver_estudiantes(self):
-        """Método que permite visualizar los estudiante matriculados en el
-        colegio
-        """
-        return
+    
+        self.lista.recorrer()
+
+
 
     def computar_nueva_nota(self, estud, nueva_nota):
         """Método que computa una nueva nota para un estudiante matriculado.
@@ -191,8 +204,7 @@ class Colegio:
         Estudiante|None
             el estudiante si está matriculado. None en caso contrario
         """
-        nuevo_estudiante = 
-        
+        pass
 
     def informe(self):
         """Método que genera una cadena a modo de Informe de todos los estudiantes
@@ -204,7 +216,7 @@ class Colegio:
             cadena con el formato:
                 "Informe del Colegio ABC / (estudiante_0) :>: (estudiante_1) :>: (estudiante_2) :>: (estudiante_n)"
         """
-        pass
+        return f"Informe del Colegio ABC / {self.lista.__str__(reversed=True)}"
 
     def promedio(self):
         """Método que calcula y retorna el promedio de todas las notas de los estudiantes
@@ -223,57 +235,57 @@ if __name__ == "__main__":
     if school.matricular(Estudiante(codigo="1001", nombre="Pepito", nota=3.0)):
         print("Pepito fue matriculado!")
 
-    # cod = "1002"
-    # nomb = "María"
-    # if school.matricular(Estudiante(cod, nomb, 4.5)):
-    #     print(f"{nomb} fue matriculad@!")
+    cod = "1002"
+    nomb = "María"
+    if school.matricular(Estudiante(cod, nomb, 4.5)):
+        print(f"{nomb} fue matriculad@!")
 
-    # cod = "1003"
-    # nomb = "Juanito Alimaña"
-    # try:
-    #     school.matricular(Estudiante(cod, nomb, -1.0))
-    # except ValueError as e:
-    #     print(f"Para el estudiante de código {cod} y nombre {nomb}: {e}")
+    cod = "1003"
+    nomb = "Juanito Alimaña"
+    try:
+        school.matricular(Estudiante(cod, nomb, -1.0))
+    except ValueError as e:
+        print(f"Para el estudiante de código {cod} y nombre {nomb}: {e}")
 
-    # cod = "1004"
-    # nomb = "Pedro"
-    # if school.matricular(Estudiante(cod, nomb)):
-    #     print(f"{nomb} fue matriculad@!")
+    cod = "1004"
+    nomb = "Pedro"
+    if school.matricular(Estudiante(cod, nomb)):
+        print(f"{nomb} fue matriculad@!")
 
-    # cod = "105"
-    # nomb = "Vanesa"
-    # try:
-    #     school.matricular(Estudiante(cod, nomb))
-    # except ValueError as e:
-    #     print(f"Para {nomb} con código {cod}: {e}")
+    cod = "105"
+    nomb = "Vanesa"
+    try:
+        school.matricular(Estudiante(cod, nomb))
+    except ValueError as e:
+        print(f"Para {nomb} con código {cod}: {e}")
 
-    # cod = "16X"
-    # nomb = "Carlos"
-    # try:
-    #     school.matricular(Estudiante(cod, nomb, 2.5))
-    # except ValueError as e:
-    #     print(f"Para {nomb} con código {cod}: {e}")
+    cod = "16X"
+    nomb = "Carlos"
+    try:
+        school.matricular(Estudiante(cod, nomb, 2.5))
+    except ValueError as e:
+        print(f"Para {nomb} con código {cod}: {e}")
 
-    # cod = "1007"
-    # nomb = "Alejandra"
-    # if school.matricular(Estudiante(cod, nomb, 4.5)):
-    #     print(f"{nomb} fue matriculad@!")
+    cod = "1007"
+    nomb = "Alejandra"
+    if school.matricular(Estudiante(cod, nomb, 4.5)):
+        print(f"{nomb} fue matriculad@!")
 
-    # print("\nVista de estudiantes matriculados:")
-    # print("-"*33)
-    # school.ver_estudiantes()
+    print("\nVista de estudiantes matriculados:")
+    print("-"*33)
+    school.ver_estudiantes()
 
-    # info = school.informe()
-    # print(info)
-    # assert info == "Informe del Colegio ABC / (1001|Pepito|3.0) :>: "\
-    #     "(1002|María|4.5) :>: (1004|Pedro|0.0) :>: (1007|Alejandra|4.5)",\
-    #     "ERROR: Informe Incorrecto"
+    info = school.informe()
+    print(info)
+    assert info == "Informe del Colegio ABC / (1001|Pepito|3.0) :>: "\
+        "(1002|María|4.5) :>: (1004|Pedro|0.0) :>: (1007|Alejandra|4.5)",\
+        "ERROR: Informe Incorrecto"
 
-    # cod = input("Código del estudiante a expulsar:")
-    # if school.expulsar(pos_est=Estudiante(cod), por_estudiante=True):
-    #     print(f"El estudiante de código {cod} fue EXPULSADO del colegio")
-    # else:
-    #     print(f"El estudiante de código {cod} no pudo ser EXPULSADO del colegio")
+    cod = input("Código del estudiante a expulsar:")
+    if school.expulsar(pos_est=Estudiante(cod), por_estudiante=True):
+        print(f"El estudiante de código {cod} fue EXPULSADO del colegio")
+    else:
+        print(f"El estudiante de código {cod} no pudo ser EXPULSADO del colegio")
 
     # print("\nVista de estudiantes matriculados:")
     # print("-"*33)
