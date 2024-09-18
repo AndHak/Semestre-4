@@ -84,7 +84,10 @@ class Estudiante:
             True si los dos estudiantes son el mismo. False en caso
             contrario
         """
-        return self.codigo == otro_estudiante.codigos
+        if not isinstance(otro_estudiante, Estudiante):
+            return False
+        return self.codigo == otro_estudiante.codigo
+
 
 
 class Colegio:
@@ -137,10 +140,10 @@ class Colegio:
                 raise ValueError("La posicion no es int")
         else:
             raise ValueError("becado debe ser bool")
+        
+    def ver_estudiantes(self):
+        self.lista.recorrer()
 
-
-
-    @property
 
     def expulsar(self, pos_est, por_estudiante=False):
         """Método que expulsa a un estudiante ya sea por estudiante o posición
@@ -160,14 +163,16 @@ class Colegio:
         bool
             True si el estudiante pudo ser expulsado. False en caso contrario
         """
-        if len(self.lista) < pos_est:
-            raise ValueError("La posicion no existe")
+        if por_estudiante:
+            if isinstance(pos_est, Estudiante):
+                return self.lista.remover(pos_est, por_pos=False)
+            else:
+                raise ValueError("Se debe proporcionar un objeto de tipo Estudiante para expulsar por estudiante.")
         else:
-            self.lista.__remover_dato(pos_est)
-
-    def ver_estudiantes(self):
-    
-        self.lista.recorrer()
+            if isinstance(pos_est, int):
+                return self.lista.remover(pos_est, por_pos=True)
+            else:
+                raise ValueError("Se debe proporcionar un entero para expulsar por posición.")
 
 
 
@@ -188,7 +193,16 @@ class Colegio:
         bool
             True si se pudo asignar la nueva nota. False en caso contrario
         """
-        pass
+        if not isinstance(estud, Estudiante):
+            raise ValueError("Se debe proporcionar un objeto de tipo Estudiante.")
+
+        estudiante = self.lista.buscar(estud.codigo)
+
+        if estudiante:
+            estudiante.nota = (estudiante.nota + nueva_nota) / 2
+            return True
+        else:
+            return False
 
     def ubicar_estudiante(self, pos_loc):
         """Método que permite ubicar un estudiante matriculado dada una
@@ -204,7 +218,11 @@ class Colegio:
         Estudiante|None
             el estudiante si está matriculado. None en caso contrario
         """
-        pass
+        if not isinstance(pos_loc, int):
+            raise ValueError("La posición debe ser un entero")
+        
+        estudiante = self.lista.obtener(pos_loc)
+        return estudiante
 
     def informe(self):
         """Método que genera una cadena a modo de Informe de todos los estudiantes
@@ -227,7 +245,9 @@ class Colegio:
         float
             promedio de todas las notas de los estudiantes matriculados en el colegio
         """
-        pass
+        estudiantes = self.lista.recorrer()
+        return sum(estud.nota for estud in estudiantes) / estudiantes
+
 
 
 if __name__ == "__main__":
@@ -287,56 +307,56 @@ if __name__ == "__main__":
     else:
         print(f"El estudiante de código {cod} no pudo ser EXPULSADO del colegio")
 
-    # print("\nVista de estudiantes matriculados:")
-    # print("-"*33)
-    # school.ver_estudiantes()
+    print("\nVista de estudiantes matriculados:")
+    print("-"*33)
+    school.ver_estudiantes()
 
-    # pos = int(input("Posición del estudiante a expulsar:"))
-    # if school.expulsar(pos_est=pos):
-    #     print(f"El estudiante de posición {pos} fue EXPULSADO del colegio")
-    # else:
-    #     print(f"El estudiante de posición {pos} no pudo ser EXPULSADO del colegio")
+    pos = int(input("Posición del estudiante a expulsar:"))
+    if school.expulsar(pos_est=pos):
+        print(f"El estudiante de posición {pos} fue EXPULSADO del colegio")
+    else:
+        print(f"El estudiante de posición {pos} no pudo ser EXPULSADO del colegio")
 
-    # print("\nVista de estudiantes matriculados:")
-    # print("-"*33)
-    # school.ver_estudiantes()
+    print("\nVista de estudiantes matriculados:")
+    print("-"*33)
+    school.ver_estudiantes()
 
-    # if school.computar_nueva_nota(Estudiante("1001"), nueva_nota=5.0):
-    #     print("Actualización de notas EXITOSA!")
-    # else:
-    #     print("NO pudo asignarse la nota!")
-    # print("\nVista de estudiantes matriculados:")
-    # print("-"*33)
-    # school.ver_estudiantes()
+    if school.computar_nueva_nota(Estudiante("1001"), nueva_nota=5.0):
+        print("Actualización de notas EXITOSA!")
+    else:
+        print("NO pudo asignarse la nota!")
+    print("\nVista de estudiantes matriculados:")
+    print("-"*33)
+    school.ver_estudiantes()
 
-    # if school.computar_nueva_nota(Estudiante("1007"), nueva_nota=1.5):
-    #     print("Actualización de notas EXITOSA!")
-    # else:
-    #     print("NO pudo asignarse la nota!")
-    # print("\nVista de estudiantes matriculados:")
-    # print("-"*33)
-    # school.ver_estudiantes()
+    if school.computar_nueva_nota(Estudiante("1007"), nueva_nota=1.5):
+        print("Actualización de notas EXITOSA!")
+    else:
+        print("NO pudo asignarse la nota!")
+    print("\nVista de estudiantes matriculados:")
+    print("-"*33)
+    school.ver_estudiantes()
 
-    # pos = int(input("Posición del estudiante a ubicar:"))
-    # estud = school.ubicar_estudiante(pos)
-    # if estud:
-    #     print("Estudiante localizado:")
-    #     print(estud)
-    # else:
-    #     print(f"El estudiante en la posición {pos} no fue econtrado!")
+    pos = int(input("Posición del estudiante a ubicar:"))
+    estud = school.ubicar_estudiante(pos)
+    if estud:
+        print("Estudiante localizado:")
+        print(estud)
+    else:
+        print(f"El estudiante en la posición {pos} no fue econtrado!")
 
-    # for i in range(4):
-    #     cod = input("Código del estudiante a calificar:")
-    #     nota = float(input("Nueva nota:"))
-    #     if school.computar_nueva_nota(Estudiante(cod), nueva_nota=nota):
-    #         print("Actualización de notas EXITOSA!")
-    #     else:
-    #         print(f"El estudiante de código {cod} no pudo ser calificado!")
+    for i in range(4):
+        cod = input("Código del estudiante a calificar:")
+        nota = float(input("Nueva nota:"))
+        if school.computar_nueva_nota(Estudiante(cod), nueva_nota=nota):
+            print("Actualización de notas EXITOSA!")
+        else:
+            print(f"El estudiante de código {cod} no pudo ser calificado!")
 
-    # print("\nVista de estudiantes matriculados:")
-    # print("-"*33)
-    # school.ver_estudiantes()
+    print("\nVista de estudiantes matriculados:")
+    print("-"*33)
+    school.ver_estudiantes()
 
-    # print(school.informe())
+    print(school.informe())
 
-    # print(f"El promedio del Colegio es {school.promedio()}")
+    print(f"El promedio del Colegio es {school.promedio()}")
