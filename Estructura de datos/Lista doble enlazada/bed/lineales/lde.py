@@ -16,6 +16,7 @@ class Lista_DE:
         self.__head = self.__tail = None
         self.__size = 0
         self.__inverso = False
+        self.__tipo_dato = None
 
     def __str__(self) -> str:
         """
@@ -78,6 +79,11 @@ class Lista_DE:
         bool
             True si la operación es exitosa.
         """
+        if self.__tipo_dato is None:
+            self.__tipo_dato = type(nuevo_dato)
+        elif type(nuevo_dato) != self.__tipo_dato:
+            raise ValueError(f"Todos los elementos deben ser del mismo tipo: {self.__tipo_dato}")
+
         nuevo_nodo = NodoListaDE(nuevo_dato)
         if self.es_vacia():
             self.__head = self.__tail = nuevo_nodo
@@ -104,6 +110,12 @@ class Lista_DE:
         bool
             True si la operación es exitosa.
         """
+        # Validación de homogeneidad
+        if self.__tipo_dato is None:
+            self.__tipo_dato = type(nuevo_dato)
+        elif type(nuevo_dato) != self.__tipo_dato:
+            raise ValueError(f"Todos los elementos deben ser del mismo tipo: {self.__tipo_dato}")
+
         if pos < 0 or pos > self.__size:
             return False
         if pos == 0:
@@ -127,6 +139,11 @@ class Lista_DE:
         bool
             True si la operación es exitosa.
         """
+        if self.__tipo_dato is None:
+            self.__tipo_dato = type(nuevo_dato)
+        elif type(nuevo_dato) != self.__tipo_dato:
+            raise ValueError(f"Todos los elementos deben ser del mismo tipo: {self.__tipo_dato}")
+        
         nuevo_nodo = NodoListaDE(nuevo_dato, siguiente=self.__head)
         if self.es_vacia():
             self.__head = self.__tail = nuevo_nodo

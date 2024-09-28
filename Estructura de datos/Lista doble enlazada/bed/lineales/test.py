@@ -90,5 +90,16 @@ class TestListaDE(unittest.TestCase):
         datos = [nodo.dato for nodo in self.lista]
         self.assertEqual(datos, [1, 2, 3])
 
+    def test_adicionar_homogeneidad(self):
+        self.lista.adicionar(1)
+        with self.assertRaises(ValueError):  
+            self.lista.adicionar("XD")
+
+    def test_posicionar_homogeneidad(self):
+        self.lista.adicionar(1)
+        with self.assertRaises(ValueError): 
+            self.lista.posicionar(2.2, 1)
+
+
 if __name__ == '__main__':
     unittest.main()
