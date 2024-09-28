@@ -136,31 +136,6 @@ class Lista_DE:
         self.__size += 1
         return True
 
-    def __insertar_medio(self, nuevo_dato, pos):
-        """
-        Inserta un nuevo nodo en una posición intermedia.
-
-        Parameters
-        ----------
-        nuevo_dato : object
-            Dato a agregar en la posición intermedia.
-        pos : int
-            Posición en la que insertar el nuevo nodo.
-
-        Returns
-        -------
-        bool
-            True si la operación es exitosa.
-        """
-        nodo_actual = self.ubicar(pos - 1)
-        nuevo_nodo = NodoListaDE(nuevo_dato, siguiente=nodo_actual, anterior=nodo_actual.anterior)
-        if nodo_actual.anterior:
-            nodo_actual.anterior.siguiente = nuevo_nodo
-        else:
-            self.__head = nuevo_nodo
-        nodo_actual.anterior = nuevo_nodo
-        self.__size += 1
-        return True
 
     def remover(self, item, por_pos=True) -> bool:
         """
@@ -171,7 +146,7 @@ class Lista_DE:
         item : object o int
             Dato del nodo a eliminar o la posición del nodo a eliminar.
         por_pos : bool, opcional
-            Indica si se elimina por posición (True) o por dato (False), por defecto True.
+            Indica si se elimina por posición True o por dato False, por defecto True.
 
         Returns
         -------
