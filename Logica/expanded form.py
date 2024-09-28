@@ -8,7 +8,7 @@ def expanded_form(num):
 
     while contador < largo:
         if numeros[contador] != "0":
-            if agregar_mas: 
+            if agregar_mas:
                 cadena += " + "
             numero = numeros[contador] + "0"*(largo-contador-1) 
             cadena += numero
