@@ -9,7 +9,7 @@ class Pila:
         """Método constructor que realiza la creación e inicialización de
         una Pila
         """
-        self.__cima:Nodo_listaSE = None
+        self.__cima: Nodo_listaSE = None
         self.__tam = 0
         #self.__tipodato = tipodato
         
@@ -108,7 +108,4 @@ class Pila:
         Cuando no hay datos:
         “===(c)===”
         """
-        if self.es_vacia():
-            return "===(c)===\n"
-        nodos = [f"(*[{nodo.dato}]*)" if nodo == self.__cima else f"({nodo.dato})" for nodo in self]
-        return "===(c)===\n" + "\n::\n".join(nodos)
+        return "===(c)===\n" if self.es_vacia() else "===(c)===\n" + "\n::\n".join([f"(*[{nodo.dato}]*)" if nodo == self.__cima else f"({nodo.dato})" for nodo in self]) 

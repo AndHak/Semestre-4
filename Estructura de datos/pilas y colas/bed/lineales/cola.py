@@ -8,7 +8,7 @@ class Cola:
     def __init__(self):
         """Método que realiza la creación e inicialización de la Cola
         """
-        self.__frente = None
+        self.__frente: Nodo_listaSE = None
         self.__tam = 0
         #self.__tipodato = tipodato
     
@@ -102,7 +102,4 @@ class Cola:
         Cuando no hay datos:
         “@|”
         """
-        if self.es_vacia():
-            return "@|"
-        nodos = [f"{{{nodo.dato}}}" if nodo == self.__frente else f"[{nodo.dato}]" for nodo in self]
-        return "@|<-" + "<-".join(nodos)
+        return "@|" if self.es_vacia() else "@|<-" + "<-".join([f"{{{nodo.dato}}}" if nodo == self.__frente else f"[{nodo.dato}]" for nodo in self])
