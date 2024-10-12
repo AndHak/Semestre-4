@@ -21,6 +21,7 @@ class Postfija:
                 continue
             i += 1
         return " ".join(resultado)
+        return " ".join(resultado)
                 
           
     def postfija(self):
@@ -59,12 +60,11 @@ class Postfija:
         
         for caracter in expresion:
             if caracter not in operadores:
-                pila_operandos.apilar(float(caracter))  # Asegurémonos de convertir a float
+                pila_operandos.apilar(float(caracter)) 
             else:
-                operando_2 = pila_operandos.desapilar()  # El último operando desapilado es el segundo
-                operando_1 = pila_operandos.desapilar()  # El penúltimo operando desapilado es el primero
+                operando_2 = pila_operandos.desapilar() 
+                operando_1 = pila_operandos.desapilar()  
                 
-                # Evaluar según el operador
                 if caracter == "+":
                     resultado = operando_1 + operando_2
                 elif caracter == "-":
@@ -76,7 +76,7 @@ class Postfija:
                 elif caracter == "^":
                     resultado = operando_1 ** operando_2
                 
-                # Apilar el resultado
+               
                 pila_operandos.apilar(resultado)  
         
-        return pila_operandos.desapilar()  # El resultado final debe ser el único elemento en la pila
+        return pila_operandos.desapilar()  
