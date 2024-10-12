@@ -1,11 +1,5 @@
-#Integrantes
-#Valentina Melo Solarte
-#Miguel Angel Narvaez Portilla
 
-if __name__ == "__main__" and __package__ is None:
-    from pila import Pila
-else:
-    from bed.lineales.pila import Pila
+from pila import Pila
 
 class Postfija:
     def __init__(self, expresion_infija: str):
@@ -62,15 +56,27 @@ class Postfija:
         expresion = self.postfija().split(" ")
         operadores = ("^", "*", "/", "+", "-")
         pila_operandos = Pila()
+        
         for caracter in expresion:
-            if not caracter in operadores:
-                pila_operandos.apilar(caracter)
+            if caracter not in operadores:
+                pila_operandos.apilar(float(caracter))  # Asegurémonos de convertir a float
             else:
-                if len(pila_operandos) >= 2:
-                    operador = "**" if caracter == "^" else caracter
-                    operando_2 = pila_operandos.desapilar()
-                    operando_1 = pila_operandos.desapilar()
-                    resultado = eval(f"{operando_1}{operador}{operando_2}")
-                    pila_operandos.apilar(resultado)
-                            
-        return pila_operandos.desapilar()
+                operando_2 = pila_operandos.desapilar()  # El último operando desapilado es el segundo
+                operando_1 = pila_operandos.desapilar()  # El penúltimo operando desapilado es el primero
+                
+                # Evaluar según el operador
+                if caracter == "+":
+                    resultado = operando_1 + operando_2
+                elif caracter == "-":
+                    resultado = operando_1 - operando_2
+                elif caracter == "*":
+                    resultado = operando_1 * operando_2
+                elif caracter == "/":
+                    resultado = operando_1 / operando_2
+                elif caracter == "^":
+                    resultado = operando_1 ** operando_2
+                
+                # Apilar el resultado
+                pila_operandos.apilar(resultado)  
+        
+        return pila_operandos.desapilar()  # El resultado final debe ser el único elemento en la pila

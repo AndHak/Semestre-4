@@ -1,6 +1,6 @@
-
+# ANDRES FELIPE MARTINEZ GUERRA
+# SEBASTIAN DAVID ORDOÑEZ BOLAÑOS 
 from nodos import Nodo_listaSE
-
 
 class Pila:
     """Clase que implementa el funcionamiento del TAD Pila
@@ -10,6 +10,8 @@ class Pila:
         una Pila
         """
         self.__cima: Nodo_listaSE = None
+        self.__tam = 0
+        #self.__tipodato = tipodato
         
     def es_vacia(self):
         """Método que verifica si la pila se encuentra vacía
@@ -20,7 +22,7 @@ class Pila:
         """
         return self.__cima is None
     
-    def apilar(self, nuevo_dato):
+    def apilar(self, dato):
         """Método que realiza la entrada de un nuevo dato a la pila.
         Realizar la validación de Homogeneidad para cada dato ingresado
         a la pila
@@ -33,11 +35,12 @@ class Pila:
         bool
         True si nuevo_dato fue apilado. False en caso contrario
         """
-        if self.__cima and not isinstance(nuevo_dato, type(self.__cima.dato)):
+        if self.__tam > 0 and not isinstance(dato, type(self.__cima.dato)):
             return False
-        nuevo_nodo = Nodo_listaSE(nuevo_dato)
+        nuevo_nodo = Nodo_listaSE(dato)
         nuevo_nodo.sig = self.__cima
         self.__cima = nuevo_nodo
+        self.__tam += 1
         return True
     
     def desapilar(self):
@@ -52,6 +55,7 @@ class Pila:
         if self.__cima:
             dato = self.__cima.dato
             self.__cima = self.__cima.sig
+            self.__tam -= 1
             return dato
         return None
     
@@ -73,13 +77,15 @@ class Pila:
         int
         Tamaño de la pila
         """
+        return self.__tam
+
+    def __iter__(self):
         actual = self.__cima
-        cantidad_nodos = 0
         while actual:
-            cantidad_nodos += 1
+            yield actual
             actual = actual.sig
-        return cantidad_nodos
-    
+
+
     def __str__(self):
         """Método especial encargado de retornar una cadena con los datos
         actuales que se encuentran en la pila (sin desapilarlos)
@@ -102,14 +108,4 @@ class Pila:
         Cuando no hay datos:
         “===(c)===”
         """
-        actual = self.__cima
-        if actual:
-            cadena_salida = "===(c)===\n"
-            while actual:
-                if actual is self.__cima:
-                    cadena_salida += f"(*[{actual.dato}]*){'\n::\n' if actual.sig else ''}"
-                else:
-                    cadena_salida += f"({actual.dato}){'\n::\n' if actual.sig else ''}"
-                actual = actual.sig
-            return cadena_salida
-        return "===(c)==="     
+        return "===(c)===\n" if self.es_vacia() else "===(c)===\n" + "\n::\n".join([f"(*[{nodo.dato}]*)" if nodo == self.__cima else f"({nodo.dato})" for nodo in self]) 

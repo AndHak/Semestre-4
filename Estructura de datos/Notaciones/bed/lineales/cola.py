@@ -1,13 +1,16 @@
-
+# ANDRES FELIPE MARTINEZ GUERRA
+# SEBASTIAN DAVID ORDOÑEZ BOLAÑOS 
 from nodos import Nodo_listaSE
-    
+
 class Cola:
     """Clase que implementa el funcionamiento del TAD Cola
     """
     def __init__(self):
         """Método que realiza la creación e inicialización de la Cola
         """
-        self.__frente = None
+        self.__frente: Nodo_listaSE = None
+        self.__tam = 0
+        #self.__tipodato = tipodato
     
     def es_vacia(self):
         """Método que verifica si la cola se encuentra vacía
@@ -33,13 +36,14 @@ class Cola:
         if self.__frente and not isinstance(nuevo_dato, type(self.__frente.dato)):
             return False
         nuevo_nodo = Nodo_listaSE(nuevo_dato)
-        actual = self.__frente
-        if actual:
+        if self.__frente:
+            actual = self.__frente
             while actual.sig:
                 actual = actual.sig
             actual.sig = nuevo_nodo
-            return True
-        self.__frente = nuevo_nodo
+        else:
+            self.__frente = nuevo_nodo
+        self.__tam += 1  
         return True
     
     def desencolar(self):
@@ -54,6 +58,7 @@ class Cola:
         if self.__frente:
             actual = self.__frente.dato
             self.__frente = self.__frente.sig
+            self.__tam -= 1
             return actual
         return None
     
@@ -74,12 +79,14 @@ class Cola:
         int
         Tamaño de la cola
         """
+        return self.__tam
+
+    def __iter__(self):
         actual = self.__frente
-        cantidad_nodos = 0
         while actual:
-            cantidad_nodos += 1
+            yield actual
             actual = actual.sig
-        return cantidad_nodos
+
     
     def __str__(self):
         """Método especial encargado de retornar una cadena con los datos
@@ -95,9 +102,4 @@ class Cola:
         Cuando no hay datos:
         “@|”
         """
-        cadena = "@|"
-        actual = self.__frente
-        while actual:
-            cadena += "<-" + (f"{{{actual.dato}}}" if actual is self.__frente else f"[{actual.dato}]")
-            actual = actual.sig
-        return cadena
+        return "@|" if self.es_vacia() else "@|<-" + "<-".join([f"{{{nodo.dato}}}" if nodo == self.__frente else f"[{nodo.dato}]" for nodo in self])

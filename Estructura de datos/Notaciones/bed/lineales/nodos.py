@@ -1,43 +1,25 @@
-
 class Nodo_listaSE:
-    """Clase que implementa el funcionamiento de un nodo para la estructura Lista Simplemente Enlazada
+    """Clase que modela un nodo para el tipo de estructura enlazada
     """
+    
     def __init__(self, dato):
-        """Método que permite construir un objeto de tipo Nodo de una LSE.
+        """metodo contructor de un nodo para una lista simplemente enlazada
 
         Parameters
         ----------
         dato : object
-            El dato a ser pasado al nodo.
+            el dato que se pasa al nodo
         """
         self.dato = dato
         self.sig = None
-
+    
     def __str__(self):
-        """Método que devuelve una cadena con el dato del nodo.
+        """metodo que retorna una cadena con el dato del nodo
 
         Returns
         -------
         str
-            La cadena del dato a ser retornado.
+            la cadena a ser retornada por el nodo que incluye el dato
         """
-        return f"{self.dato}"
-    
-class Nodo_listaCSE(Nodo_listaSE):
-    """Clase que implementa el funcionamiento de un nodo para la estructura Lista Circular Simplemente Enlazada
-    
+        return str(self.dato)
 
-    Parameters
-    ----------
-    Nodo_listaSE : object
-        clase padre de la clase Nodo_listaCSE
-    """
-    def __init__(self, dato):
-        """Método que permite construir un objeto de tipo Nodo de una LCSE.
-
-        Parameters
-        ----------
-        dato : object
-            El dato a ser pasado al nodo.
-        """
-        super().__init__(dato)
