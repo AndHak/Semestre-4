@@ -2,7 +2,7 @@
 from pila import Pila
 
 class Postfija:
-    def __init__(self, expresion_infija: str):
+    def __init__(self, expresion_infija=str):
         self.expresion_infija = expresion_infija
     
     def infija(self):
@@ -21,8 +21,6 @@ class Postfija:
                 continue
             i += 1
         return " ".join(resultado)
-        return " ".join(resultado)
-                
           
     def postfija(self):
         operadores = {

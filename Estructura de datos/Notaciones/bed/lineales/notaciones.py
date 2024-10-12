@@ -1,82 +1,86 @@
 from pila import Pila
 from lse import Lista_SE
 
+
 class Prefija:
     def __init__(self, expresion_infija: str):
         self.expresion_infija = expresion_infija
 
     def infija(self) -> str:
-        lista = Lista_SE()
-        operadores = "+-*/^()"
-        numero_actual = ""
-        
-        for caracter in self.expresion_infija:
-            if caracter.isspace():
+        resultado = []
+        operadores = ('+', '-', '*', '/', '^', '(', ')')
+        i = 0
+        while i < len(self.expresion_infija):
+            if self.expresion_infija[i] in operadores:
+                resultado.append(self.expresion_infija[i])
+            elif self.expresion_infija[i].isdigit():
+                numeros = []
+                while i < len(self.expresion_infija) and self.expresion_infija[i].isdigit():
+                    numeros.append(self.expresion_infija[i])
+                    i += 1
+                resultado.append("".join(numeros))
                 continue
-            
-            if caracter in operadores:
-                if numero_actual:
-                    lista.adicionar(numero_actual)
-                    numero_actual = ""
-                lista.adicionar(caracter)
-            elif caracter.isdigit():
-                numero_actual += caracter
-            else:
-                if numero_actual:
-                    lista.adicionar(numero_actual)
-                    numero_actual = ""
-                lista.adicionar(caracter)
-        
-        if numero_actual:
-            lista.adicionar(numero_actual)
-        
-        return " ".join(str(item) for item in lista)
-
+            i += 1
+        return " ".join(resultado)
 
     def prefija(self) -> str:
-        pila = Pila()
-        salida = Lista_SE()
-        precedencia = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3}
+        operadores = {
+            "^": (4, 3),
+            "*": (2, 2),
+            "/": (2, 2),
+            "+": (1, 1),
+            "-": (1, 1),
+            "(": (5, 0)
+        }
+        resultado = []
+        pila_operadores = Pila()
+        expresion_lista = self.infija().split(" ")
         
-        for token in self.infija().split():
-            if token.isdigit() or (token[0] == '-' and len(token) > 1 and token[1:].isdigit()):
-                salida.adicionar(token)
-            elif token == '(':
-                pila.apilar(token)
-            elif token == ')':
-                while not pila.es_vacia() and pila.cima() != '(':
-                    salida.adicionar(pila.desapilar())
-                if not pila.es_vacia() and pila.cima() == '(':
-                    pila.desapilar()
+        for i in reversed(range(len(expresion_lista))-1,-1):
+            expresion_lista[i]
+            if expresion_lista[i] == "(":
+                desapilado = pila_operadores.desapilar()
+                while desapilado != ")":
+                    resultado.append(desapilado)
+                    desapilado = pila_operadores.desapilar()
+            elif expresion_lista[i] in operadores:
+                while not pila_operadores.es_vacia() and operadores[expresion_lista[i]][0] < operadores[pila_operadores.cima()][1]:
+                    resultado.append(pila_operadores.desapilar())
+                pila_operadores.apilar(expresion_lista[i])
             else:
-                while (not pila.es_vacia() and pila.cima() != '(' and
-                       precedencia.get(pila.cima(), 0) >= precedencia.get(token, 0)):
-                    salida.adicionar(pila.desapilar())
-                pila.apilar(token)
-        
-        while not pila.es_vacia():
-            salida.adicionar(pila.desapilar())
-        
-        return " ".join(str(item) for item in reversed(list(salida)))
+                resultado.append(expresion_lista[i])
+
+        while not pila_operadores.es_vacia():
+            resultado.append(pila_operadores.desapilar())
+        return " ".join(reversed(resultado))
+
+
 
     def eval_expr_aritm(self) -> float:
-        pila = Pila()
-        
-        for token in self.prefija().split():
-            if token.isdigit() or (token[0] == '-' and len(token) > 1 and token[1:].isdigit()):
-                pila.apilar(float(token))
+        expresion = self.prefija().split()  
+        operadores = {"^", "*", "/", "+", "-"}
+        pila_operandos = Pila()
+
+        for token in reversed(expresion):
+            if token not in operadores:
+                pila_operandos.apilar(float(token))
             else:
-                b = pila.desapilar()
-                a = pila.desapilar()
-                if token == '+':
-                    pila.apilar(a + b)
-                elif token == '-':
-                    pila.apilar(a - b)
-                elif token == '*':
-                    pila.apilar(a * b)
-                elif token == '/':
-                    pila.apilar(a / b)
-                elif token == '^':
-                    pila.apilar(a ** b)
-        
-        return pila.desapilar()
+                operando_1 = pila_operandos.desapilar()
+                operando_2 = pila_operandos.desapilar()
+
+                if token == "+":
+                    resultado = operando_1 + operando_2
+                elif token == "-":
+                    resultado = operando_1 - operando_2
+                elif token == "*":
+                    resultado = operando_1 * operando_2
+                elif token == "/":
+                    resultado = operando_1 / operando_2
+                elif token == "^":
+                    resultado = operando_1 ** operando_2
+
+                pila_operandos.apilar(resultado)
+
+        return pila_operandos.desapilar()
+
+
