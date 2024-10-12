@@ -332,6 +332,8 @@ class Lista_SE:
             actual = actual.sig
 
 
+
+
 if __name__ == "__main__":
     # Crear una lista simplemente enlazada
     list_num = Lista_SE()

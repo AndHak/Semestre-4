@@ -23,33 +23,37 @@ class Postfija:
         return " ".join(resultado)
           
     def postfija(self):
-        operadores = {
-            "^": (4, 3), 
-            "*": (2, 2), 
-            "/": (2, 2), 
-            "+": (1, 1), 
-            "-": (1, 1), 
-            "(": (5, 0)
-        }
-        resultado = []
-        pila_operadores = Pila()
-        expresion_lista = self.infija().split(" ")
-        for i in range(len(expresion_lista)):
-            if expresion_lista[i] == ")":
-                desapilado = pila_operadores.desapilar()
-                while desapilado != "(":
-                    resultado.append(desapilado)
-                    desapilado = pila_operadores.desapilar()
-            elif expresion_lista[i] in operadores:
-                while not pila_operadores.es_vacia() and operadores[expresion_lista[i]][0] <= operadores[pila_operadores.cima()][1]:
-                    resultado.append(pila_operadores.desapilar())
-                pila_operadores.apilar(expresion_lista[i])
-            else:
-                resultado.append(expresion_lista[i])
-        while not pila_operadores.es_vacia():
-            resultado.append(pila_operadores.desapilar())
-                    
-        return " ".join(resultado)
+        operadores = {  
+            "^": (4, 3),  
+            "*": (3, 2),  
+            "/": (3, 2),  
+            "+": (2, 1),  
+            "-": (2, 1),  
+            "(": (1, 0)  
+        }  
+        resultado = []  
+        pila_operadores = Pila()  
+        expresion_lista = self.infija().split(" ")[::-1]  # Reversar la expresión infija  
+
+        for token in expresion_lista:  
+            if token == ")":  
+                pila_operadores.apilar(token)  
+            elif token == "(":  
+                while not pila_operadores.es_vacia() and pila_operadores.cima() != ")":  
+                    resultado.append(pila_operadores.desapilar())  
+                pila_operadores.desapilar()  # Desapilar ")"  
+            elif token in operadores:  
+                while (not pila_operadores.es_vacia() and  
+                       operadores[token][0] < operadores[pila_operadores.cima()][1]):  
+                    resultado.append(pila_operadores.desapilar())  
+                pila_operadores.apilar(token)  
+            else:  
+                resultado.append(token)  
+
+        while not pila_operadores.es_vacia():  
+            resultado.append(pila_operadores.desapilar())  
+            
+        return " ".join(reversed(resultado)) 
 
     def eval_expr_aritm(self):
         expresion = self.postfija().split(" ")
