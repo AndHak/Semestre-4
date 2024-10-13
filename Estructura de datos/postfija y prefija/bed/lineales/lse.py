@@ -331,18 +331,6 @@ class Lista_SE:
             yield actual.dato
             actual = actual.sig
 
-    #Agregada para que funcione la notacion prefija sin uso de listas python
-    def __reversed__(self):
-        """Método especial para recorrer la lista en orden inverso."""
-        nodos = []
-        actual = self.__cab
-        
-        while actual:
-            nodos.append(actual.dato)
-            actual = actual.sig  
-        
-        for dato in reversed(nodos):
-            yield dato
 
 
 
