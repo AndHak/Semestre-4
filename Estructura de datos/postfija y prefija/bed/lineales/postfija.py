@@ -5,22 +5,16 @@ class Postfija:
     def __init__(self, expresion_infija=str):
         self.expresion_infija = expresion_infija
     
-    def infija(self):
-        resultado = []
-        operadores = ('+', '-', '*', '/', '^', '(', ')')
-        i = 0
-        while i < len(self.expresion_infija):
-            if self.expresion_infija[i] in operadores:
-                resultado.append(self.expresion_infija[i])
-            elif self.expresion_infija[i].isdigit():
-                numeros = []
-                while i < len(self.expresion_infija) and self.expresion_infija[i].isdigit():
-                    numeros.append(self.expresion_infija[i])
-                    i += 1
-                resultado.append("".join(numeros))
-                continue
-            i += 1
-        return " ".join(resultado)
+    def infija(self) -> str:
+        def recursion(i=0):
+            if i == len(self.expresion_infija):
+                return ""
+            if self.expresion_infija[i].isdigit():
+                num = self.expresion_infija[i]
+                return num + recursion(i + 1) if i + 1 < len(self.expresion_infija) and self.expresion_infija[i + 1].isdigit() else num + " " + recursion(i + 1)
+            return self.expresion_infija[i] + " " + recursion(i + 1)
+
+        return recursion().strip()
           
     def postfija(self):
         operadores = {  
@@ -55,30 +49,17 @@ class Postfija:
             
         return " ".join(reversed(resultado)) 
 
-    def eval_expr_aritm(self):
-        expresion = self.postfija().split(" ")
-        operadores = ("^", "*", "/", "+", "-")
-        pila_operandos = Pila()
-        
-        for caracter in expresion:
-            if caracter not in operadores:
-                pila_operandos.apilar(float(caracter)) 
+    def eval_expr_aritm(self) -> float:
+        operadores = {'+': lambda x, y: x + y, '-': lambda x, y: x - y,
+                      '*': lambda x, y: x * y, '/': lambda x, y: x / y, 
+                      '^': lambda x, y: x ** y}
+        pila = Pila()
+
+        for i in reversed(self.prefija().split()):
+            if i.isdigit():
+                pila.apilar(float(i))
             else:
-                operando_2 = pila_operandos.desapilar() 
-                operando_1 = pila_operandos.desapilar()  
-                
-                if caracter == "+":
-                    resultado = operando_1 + operando_2
-                elif caracter == "-":
-                    resultado = operando_1 - operando_2
-                elif caracter == "*":
-                    resultado = operando_1 * operando_2
-                elif caracter == "/":
-                    resultado = operando_1 / operando_2
-                elif caracter == "^":
-                    resultado = operando_1 ** operando_2
-                
-               
-                pila_operandos.apilar(resultado)  
-        
-        return pila_operandos.desapilar()  
+                operando_1, operando_2 = pila.desapilar(), pila.desapilar()
+                pila.apilar(operadores[i](operando_1, operando_2))
+
+        return pila.desapilar()
