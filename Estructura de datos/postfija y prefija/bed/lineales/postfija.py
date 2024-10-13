@@ -27,7 +27,7 @@ class Postfija:
         }  
         resultado = []  
         pila_operadores = Pila()  
-        expresion_lista = self.infija().split(" ")[::-1]  # Reversar la expresión infija  
+        expresion_lista = self.infija().split(" ")[::-1] 
 
         for token in expresion_lista:  
             if token == ")":  
@@ -35,7 +35,7 @@ class Postfija:
             elif token == "(":  
                 while not pila_operadores.es_vacia() and pila_operadores.cima() != ")":  
                     resultado.append(pila_operadores.desapilar())  
-                pila_operadores.desapilar()  # Desapilar ")"  
+                pila_operadores.desapilar()  
             elif token in operadores:  
                 while (not pila_operadores.es_vacia() and  
                        operadores[token][0] < operadores[pila_operadores.cima()][1]):  

@@ -21,7 +21,7 @@ class Prefija:
         salida = Lista_SE()
         precedencia = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3}
 
-        # Recorremos la expresión infija de derecha a izquierda
+
         for i in reversed(self.infija().split()):
             if i.isdigit() or (i[0] == '-' and len(i) > 1 and i[1:].isdigit()) or '.' in i:
                 salida.adicionar(i)  
