@@ -1,0 +1,75 @@
+{
+    "criterio": "raiz",
+    "valor": "Inicio",
+    "es_hoja": false,
+    "clasificacion": null,
+    "hijos": [
+        {
+            "criterio": "edad",
+            "valor": "18 a 30 a\u00f1os",
+            "es_hoja": true,
+            "clasificacion": "Adulto Joven",
+            "hijos": [
+                {
+                    "criterio": "ocupacion",
+                    "valor": "Estudiante",
+                    "es_hoja": true,
+                    "clasificacion": "Estudiante",
+                    "hijos": []
+                },
+                {
+                    "criterio": "ocupacion",
+                    "valor": "Trabajador",
+                    "es_hoja": true,
+                    "clasificacion": "Trabajador",
+                    "hijos": []
+                }
+            ]
+        },
+        {
+            "criterio": "edad",
+            "valor": "31 a 40 a\u00f1os",
+            "es_hoja": true,
+            "clasificacion": "Adulto",
+            "hijos": [
+                {
+                    "criterio": "ocupacion",
+                    "valor": "Trabajador",
+                    "es_hoja": true,
+                    "clasificacion": "Trabajador",
+                    "hijos": []
+                }
+            ]
+        },
+        {
+            "criterio": "edad",
+            "valor": "41 a 50 a\u00f1os",
+            "es_hoja": true,
+            "clasificacion": "Adulto",
+            "hijos": [
+                {
+                    "criterio": "ocupacion",
+                    "valor": "Trabajador",
+                    "es_hoja": true,
+                    "clasificacion": "Trabajador",
+                    "hijos": []
+                }
+            ]
+        },
+        {
+            "criterio": "edad",
+            "valor": "M\u00e1s de 50 a\u00f1os",
+            "es_hoja": true,
+            "clasificacion": "Adulto Mayor",
+            "hijos": [
+                {
+                    "criterio": "ocupacion",
+                    "valor": "Jubilado",
+                    "es_hoja": true,
+                    "clasificacion": "Jubilado",
+                    "hijos": []
+                }
+            ]
+        }
+    ]
+}
