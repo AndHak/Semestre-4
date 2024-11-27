@@ -13,9 +13,9 @@ class Nodo(QtWidgets.QGraphicsEllipseItem):
         super().__init__(-30, -30, 60, 60)
 
         # Estilo con degradado
-        gradiente = QRadialGradient(0, 0, 30)
-        gradiente.setColorAt(0, QColor(255, 255, 200))  # Color central claro
-        gradiente.setColorAt(1, QColor(255, 204, 102))  # Borde más oscuro
+        gradiente = QRadialGradient(0, 0, 40)
+        gradiente.setColorAt(0, QColor(207, 227, 241))
+        gradiente.setColorAt(1, QColor(62, 160, 227))
         self.setBrush(QBrush(gradiente))
         self.setPen(QPen(Qt.black, 2))
 
@@ -32,7 +32,7 @@ class Nodo(QtWidgets.QGraphicsEllipseItem):
         self.texto.setDefaultTextColor(Qt.black)
         fuente = QFont("Arial", 14, QFont.Bold)
         self.texto.setFont(fuente)
-        self.texto.setPos(-self.texto.boundingRect().width() / 2, -20)
+        self.texto.setPos(-self.texto.boundingRect().width() / 2, -15)
 
         escena.addItem(self)
         self.setPos(x, y)
@@ -50,12 +50,22 @@ class Nodo(QtWidgets.QGraphicsEllipseItem):
         for arista in self.aristas:
             arista.ajustar()
 
-    def eliminar(self, escena):
+    def eliminar(self, escena, aristas_globales):
         """Eliminar nodo y sus aristas asociadas."""
         while self.aristas:
             arista = self.aristas.pop()
+            # Eliminar la arista de la escena y de los nodos conectados
+            arista.origen.eliminar_arista(arista)
+            arista.destino.eliminar_arista(arista)
             arista.eliminar()
+            
+            # Eliminar también de la lista global de aristas si existe
+            if arista in aristas_globales:
+                aristas_globales.remove(arista)
+
+        # Finalmente, eliminar el nodo de la escena
         escena.removeItem(self)
+
 
 
 class Arista(QGraphicsTextItem):
@@ -273,7 +283,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if ok and nombre:
             nodo = next(n for n in self.nodos if n.nombre == nombre)
-            nodo.eliminar(self.escena)
+            nodo.eliminar(self.escena, self.aristas)
             self.nodos.remove(nodo)
 
     def modo_conectar_nodo(self):
