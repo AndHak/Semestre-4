@@ -347,8 +347,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Mostrar resultados en la tabla
         self.mostrar_resultados_mst(mst_aristas, total_costo)
 
-    from PySide6.QtGui import QStandardItemModel, QStandardItem
-
     def mostrar_resultados_mst(self, mst_aristas, total_costo): 
         """Mostrar resultados del MST en la tabla."""
         # Crear un modelo de tabla estándar
