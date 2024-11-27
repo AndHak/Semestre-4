@@ -287,38 +287,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Mostrar tabla con nodos y costos
         self.mostrar_resultados_mst(mst_aristas, total_costo)
 
-    def calcular_mst(self):
-        """Calcular el MST con el algoritmo de Prim, permitiendo elegir el nodo inicial."""
-        if not self.nodos or not self.aristas:
-            return
-
-        nombres_nodos = [nodo.nombre for nodo in self.nodos]
-        nodo_inicial, ok = QInputDialog.getItem(self, "Calcular MST", "Seleccione el Nodo Inicial:", nombres_nodos, editable=False)
-        if not ok:
-            return
-
-        # Algoritmo de Prim
-        nodo_inicio = next(n for n in self.nodos if n.nombre == nodo_inicial)
-        visitados = {nodo_inicio}
-        aristas_posibles = list(nodo_inicio.aristas)
-        mst_aristas = []
-
-        while aristas_posibles:
-            aristas_posibles.sort(key=lambda e: e.peso)
-            arista_minima = aristas_posibles.pop(0)
-            siguiente_nodo = arista_minima.destino if arista_minima.origen in visitados else arista_minima.origen
-
-            if siguiente_nodo not in visitados:
-                visitados.add(siguiente_nodo)
-                mst_aristas.append(arista_minima)
-                for arista in siguiente_nodo.aristas:
-                    if arista.destino not in visitados or arista.origen not in visitados:
-                        aristas_posibles.append(arista)
-
-        # Mostrar MST
-        for arista in mst_aristas:
-            arista.linea.setPen(QPen(Qt.red, 3))
-
 
 def main():
     import sys
