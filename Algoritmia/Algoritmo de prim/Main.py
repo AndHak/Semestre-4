@@ -304,7 +304,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 (arista.origen.nombre == destino_nombre and arista.destino.nombre == origen_nombre)
                 for arista in self.aristas
             ):
-                QMessageBox.warning(self, "Error", "Ya existe un enlace entre estos nodos.")
+                QMessageBox.information(self, "Error", "Ya existe un enlace entre estos nodos.")
                 return
 
             origen = next(n for n in self.nodos if n.nombre == origen_nombre)
@@ -319,7 +319,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def calcular_mst(self):
         """Calcular el MST con el algoritmo de Prim."""
         if not self.nodos or not self.aristas:
-            QMessageBox.information(self, "Error", "No hay nodos o aristas en el grafo.")
+            QMessageBox.information(self, "Error", "No hay nodos o Enlaces en el grafo.")
             return
 
         nombres_nodos = [nodo.nombre for nodo in self.nodos]
@@ -368,9 +368,19 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Llenar el modelo
         for fila, arista in enumerate(mst_aristas):
-            modelo.setItem(fila, 0, QStandardItem(arista.origen.nombre))
-            modelo.setItem(fila, 1, QStandardItem(arista.destino.nombre))
-            modelo.setItem(fila, 2, QStandardItem(str(arista.peso)))
+            item_origen = QStandardItem(arista.origen.nombre)
+            item_destino = QStandardItem(arista.destino.nombre)
+            item_peso = QStandardItem(str(arista.peso))
+            
+            # Configurar las celdas como solo lectura
+            item_origen.setFlags(item_origen.flags() & ~Qt.ItemIsEditable)
+            item_destino.setFlags(item_destino.flags() & ~Qt.ItemIsEditable)
+            item_peso.setFlags(item_peso.flags() & ~Qt.ItemIsEditable)
+            
+            # Agregar los elementos al modelo
+            modelo.setItem(fila, 0, item_origen)
+            modelo.setItem(fila, 1, item_destino)
+            modelo.setItem(fila, 2, item_peso)
         
         # Asignar el modelo al TableView
         self.ui.tableview_mst.setModel(modelo)
@@ -380,6 +390,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Mostrar costo total
         self.ui.label_digitar_costo_total.setText(f" {total_costo}")
+
 
 
 def main():
