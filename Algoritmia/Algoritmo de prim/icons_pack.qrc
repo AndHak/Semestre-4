@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="Icons">
+    <file>icons/add_node.png</file>
+    <file>icons/icons8-algorithm-100.png</file>
+    <file>icons/icons8-delete-96.png</file>
+    <file>icons/icons8-delete-node-100.png</file>
+    <file>icons/icons8-link-100.png</file>
+    <file>icons/icons8-link-128.png</file>
+    <file>icons/icons8-play-100.png</file>
+  </qresource>
+</RCC>

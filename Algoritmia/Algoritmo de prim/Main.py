@@ -1,4 +1,4 @@
-
+from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QGraphicsView, QGraphicsScene,
     QPushButton, QVBoxLayout, QWidget, QGraphicsEllipseItem,
@@ -7,7 +7,45 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QPen, QBrush, QCursor, QFont, QPainter
 from PySide6.QtCore import Qt
+from ui_MainApp import Ui_MainWindow
 
+class ConectarNodosDialog(QtWidgets.QDialog):
+    def __init__(self, nombres_nodos, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Conectar Nodos")
+
+        # Campos de entrada
+        self.origen_combo = QtWidgets.QComboBox()
+        self.origen_combo.addItems(nombres_nodos)
+
+        self.destino_combo = QtWidgets.QComboBox()
+        self.destino_combo.addItems(nombres_nodos)
+        self.destino_combo.setCurrentIndex(1) 
+
+        self.peso_spinbox = QtWidgets.QSpinBox()
+        self.peso_spinbox.setRange(1, 100)
+        self.peso_spinbox.setValue(1)
+
+        # Layout
+        layout = QtWidgets.QFormLayout()
+        layout.addRow("Nodo de Origen:", self.origen_combo)
+        layout.addRow("Nodo de Destino:", self.destino_combo)
+        layout.addRow("Peso:", self.peso_spinbox)
+
+        # Botones
+        botones = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        botones.accepted.connect(self.accept)
+        botones.rejected.connect(self.reject)
+        layout.addWidget(botones)
+
+        self.setLayout(layout)
+
+    def get_result(self):
+        return (
+            self.origen_combo.currentText(),
+            self.destino_combo.currentText(),
+            self.peso_spinbox.value()
+        )
 
 class Arista(QGraphicsTextItem):
     def __init__(self, origen, destino, peso, escena):
@@ -41,7 +79,6 @@ class Arista(QGraphicsTextItem):
         """Eliminar la arista de la escena."""
         self.escena.removeItem(self.linea)
         self.escena.removeItem(self)
-
 
 class Nodo(QGraphicsEllipseItem):
     def __init__(self, x, y, nombre, escena):
@@ -83,42 +120,95 @@ class Nodo(QGraphicsEllipseItem):
             arista.eliminar()
         escena.removeItem(self)
 
+class Nodo(QtWidgets.QGraphicsEllipseItem):
+    def __init__(self, x, y, nombre, escena):
+        super().__init__(-30, -30, 60, 60)
+        self.setBrush(QBrush(Qt.yellow))
+        self.setPen(QPen(Qt.black, 2))
+        self.setFlag(QtWidgets.QGraphicsEllipseItem.GraphicsItemFlag.ItemIsMovable)
+        self.setFlag(QtWidgets.QGraphicsEllipseItem.GraphicsItemFlag.ItemIsSelectable)
+        self.setZValue(1)
+        self.nombre = nombre
+        self.aristas = []
 
-class AplicacionGrafo(QMainWindow):
+        # Texto del nodo
+        self.texto = QtWidgets.QGraphicsTextItem(nombre, self)
+        self.texto.setDefaultTextColor(Qt.black)
+        fuente = QFont("Arial", 14, QFont.Bold)
+        self.texto.setFont(fuente)
+        self.texto.setPos(-self.texto.boundingRect().width() / 2, -20)
+        escena.addItem(self)
+        self.setPos(x, y)
+
+    def add_arista(self, arista):
+        self.aristas.append(arista)
+
+    def eliminar_arista(self, arista):
+        if arista in self.aristas:
+            self.aristas.remove(arista)
+
+    def mouseMoveEvent(self, event):
+        """Actualizar las aristas conectadas al mover el nodo."""
+        super().mouseMoveEvent(event)
+        for arista in self.aristas:
+            arista.ajustar()
+
+    def eliminar(self, escena):
+        """Eliminar nodo y sus aristas asociadas."""
+        while self.aristas:
+            arista = self.aristas.pop()
+            arista.eliminar()
+        escena.removeItem(self)
+
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Visualizador de Grafos")
-        self.setGeometry(100, 100, 800, 600)
 
+        # Setup UI from designer file
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        self.setWindowTitle("Algoritmo de Prim")
+        self.setWindowIcon(QtGui.QIcon("C:\Programacion Universidad\Semestre 4\Algoritmia\Algoritmo de prim\icons\icons8-algorithm-100.png"))
+        
+
+        # Crear la escena gráfica
         self.escena = QGraphicsScene()
         self.vista = QGraphicsView(self.escena)
         self.vista.setRenderHint(QPainter.Antialiasing)
 
-        # Botones
-        self.boton_agregar_nodo = QPushButton("Crear Nodo")
-        self.boton_eliminar_nodo = QPushButton("Eliminar Nodo")
-        self.boton_conectar_nodo = QPushButton("Conectar Nodos")
-        self.boton_calcular_mst = QPushButton("Calcular MST")
+        # Busca el layout existente y reemplaza su contenido
+        layout = self.ui.widget_grafo.layout()
+        if layout is None:
+            layout = QVBoxLayout(self.ui.widget_grafo)
+        
+        # Limpiar layout existente
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
 
-        layout = QVBoxLayout()
+        # Agregar la vista al layout
         layout.addWidget(self.vista)
-        layout.addWidget(self.boton_agregar_nodo)
-        layout.addWidget(self.boton_eliminar_nodo)
-        layout.addWidget(self.boton_conectar_nodo)
-        layout.addWidget(self.boton_calcular_mst)
 
-        contenedor = QWidget()
-        contenedor.setLayout(layout)
-        self.setCentralWidget(contenedor)
-
-        # Conexiones
-        self.boton_agregar_nodo.clicked.connect(self.modo_agregar_nodo)
-        self.boton_eliminar_nodo.clicked.connect(self.modo_eliminar_nodo)
-        self.boton_conectar_nodo.clicked.connect(self.modo_conectar_nodo)
-        self.boton_calcular_mst.clicked.connect(self.calcular_mst)
-
+        # Configuraciones adicionales
         self.nodos = []
         self.aristas = []
+
+        # Conectar botones
+        self.ui.add_nodo_button.clicked.connect(self.modo_agregar_nodo)
+        self.ui.delete_nodo_button.clicked.connect(self.modo_eliminar_nodo)
+        self.ui.hacer_enlace_button.clicked.connect(self.modo_conectar_nodo)
+        self.ui.delete_link.clicked.connect(self.modo_eliminar_enlace)
+        self.ui.delete_all_button.clicked.connect(self.eliminar_todo)
+        self.ui.calcular_mst_button.clicked.connect(self.calcular_mst)
+
+    def modo_eliminar_enlace(self):
+        pass
+
+    def eliminar_todo(self):
+        pass
+
 
     def modo_agregar_nodo(self):
         """Agregar un nodo a la escena."""
@@ -230,8 +320,12 @@ class AplicacionGrafo(QMainWindow):
             arista.linea.setPen(QPen(Qt.red, 3))
 
 
+def main():
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
+
 if __name__ == "__main__":
-    app = QApplication([])
-    ventana = AplicacionGrafo()
-    ventana.show()
-    app.exec()
+    main()
