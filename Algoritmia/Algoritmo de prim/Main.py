@@ -223,7 +223,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if ok and enlace_seleccionado:
             # Encontrar la arista correspondiente
             for arista in self.aristas[:]:  # Copia de lista para seguridad al modificar
-                if (f"{arista.origen.nombre} -> {arista.destino.nombre} (Peso: {arista.peso})" == enlace_seleccionado):
+                if (f"{arista.origen.nombre} --> {arista.destino.nombre} (Peso: {arista.peso})" == enlace_seleccionado):
                     # Eliminar la arista de los nodos
                     arista.origen.eliminar_arista(arista)
                     arista.destino.eliminar_arista(arista)
@@ -235,6 +235,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.aristas.remove(arista)
                     
                     break
+
 
     def eliminar_todo(self):
         """Eliminar todos los nodos y aristas."""
