@@ -325,7 +325,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Restablecer colores de aristas
         for arista in self.aristas:
-            arista.linea.setPen(QPen(Qt.black, 2))
+            arista.linea.setPen(QPen(Qt.darkGray, 2))
 
         # Marcar aristas del MST en rojo
         for arista in mst_aristas:
