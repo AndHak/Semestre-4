@@ -10,7 +10,7 @@ from ui_MainApp import Ui_MainWindow
 
 class Nodo(QtWidgets.QGraphicsEllipseItem):
     def __init__(self, x, y, nombre, escena):
-        super().__init__(-30, -30, 60, 60)
+        super().__init__(-35, -35, 70, 70)
 
         # Estilo con degradado
         gradiente = QRadialGradient(0, 0, 40)
@@ -32,7 +32,7 @@ class Nodo(QtWidgets.QGraphicsEllipseItem):
         self.texto.setDefaultTextColor(Qt.black)
         fuente = QFont("Arial", 14, QFont.Bold)
         self.texto.setFont(fuente)
-        self.texto.setPos(-self.texto.boundingRect().width() / 2, -15)
+        self.texto.setPos(-self.texto.boundingRect().width() / 2, -self.texto.boundingRect().height() / 2)
 
         escena.addItem(self)
         self.setPos(x, y)
@@ -59,11 +59,11 @@ class Nodo(QtWidgets.QGraphicsEllipseItem):
             arista.destino.eliminar_arista(arista)
             arista.eliminar()
             
-            # Eliminar también de la lista global de aristas si existe
+            # Eliminar también de la lista global de aristas
             if arista in aristas_globales:
                 aristas_globales.remove(arista)
 
-        # Finalmente, eliminar el nodo de la escena
+        # eliminar el nodo de la escena
         escena.removeItem(self)
 
 
@@ -81,8 +81,8 @@ class Arista(QGraphicsTextItem):
 
         # Peso de la arista
         self.setPlainText(str(peso))
-        self.setDefaultTextColor(Qt.darkBlue)
-        fuente = QFont("Arial", 10, QFont.Bold)
+        self.setDefaultTextColor(Qt.darkGray)
+        fuente = QFont("Arial", 12, QFont.Bold)
         self.setFont(fuente)
 
         self.escena = escena
@@ -144,10 +144,7 @@ class ConectarNodosDialog(QtWidgets.QDialog):
         # Deshabilitar el nodo de origen en la lista de destino
         origen_actual = self.origen_combo.currentText()
         
-        # Guardar el destino actual
-        destino_actual = self.destino_combo.currentText()
-        
-        # Limpiar y repoblar el combo de destino
+        # Limpiar y llenar el destino sin el origen
         self.destino_combo.clear()
         destinos_disponibles = [
             nodo for nodo in [self.origen_combo.itemText(i) for i in range(self.origen_combo.count())] 
@@ -155,10 +152,6 @@ class ConectarNodosDialog(QtWidgets.QDialog):
         ]
         self.destino_combo.addItems(destinos_disponibles)
         
-        # Intentar mantener el destino anterior si está disponible
-        index = self.destino_combo.findText(destino_actual)
-        if index != -1:
-            self.destino_combo.setCurrentIndex(index)
 
     def get_result(self):
         return (
@@ -183,23 +176,16 @@ class MainWindow(QtWidgets.QMainWindow):
         # Crear la escena gráfica
         self.escena = QGraphicsScene()
         self.vista = QGraphicsView(self.escena)
+        # Suavizar
         self.vista.setRenderHint(QPainter.Antialiasing)
 
-        # Busca el layout existente y reemplaza su contenido
+
         layout = self.ui.widget_grafo.layout()
         if layout is None:
             layout = QVBoxLayout(self.ui.widget_grafo)
         
-        # Limpiar layout existente
-        while layout.count():
-            child = layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
-
-        # Agregar la vista al layout
         layout.addWidget(self.vista)
 
-        # Configuraciones adicionales
         self.nodos = []
         self.aristas = []
 
@@ -219,41 +205,26 @@ class MainWindow(QtWidgets.QMainWindow):
             return
 
         # Crear lista de enlaces para mostrar
-        enlaces = [f"{arista.origen.nombre} --> {arista.destino.nombre} (Peso: {arista.peso})" for arista in self.aristas]
+        enlaces = [f"{arista.origen.nombre} --> {arista.destino.nombre}   (Peso: {arista.peso})" for arista in self.aristas]
         
         # Mostrar diálogo de selección de enlace
-        enlace_seleccionado, ok = QInputDialog.getItem(
-            self, 
-            "Eliminar Enlace", 
-            "Seleccione el enlace a eliminar:", 
-            enlaces, 
-            editable=False
-        )
+        enlace_seleccionado, ok = QInputDialog.getItem(self, "Eliminar Enlace", "Seleccione el enlace a eliminar:", enlaces, editable=False)
 
         if ok and enlace_seleccionado:
-            # Encontrar la arista correspondiente
-            for arista in self.aristas[:]:  # Copia de lista para seguridad al modificar
-                if (f"{arista.origen.nombre} --> {arista.destino.nombre} (Peso: {arista.peso})" == enlace_seleccionado):
-                    # Eliminar la arista de los nodos
+            for arista in self.aristas[:]:
+                if (f"{arista.origen.nombre} --> {arista.destino.nombre}   (Peso: {arista.peso})" == enlace_seleccionado):
                     arista.origen.eliminar_arista(arista)
                     arista.destino.eliminar_arista(arista)
-                    
-                    # Eliminar la arista de la escena
                     arista.eliminar()
-                    
-                    # Eliminar de la lista de aristas
                     self.aristas.remove(arista)
-                    
                     break
 
 
     def eliminar_todo(self):
         """Eliminar todos los nodos y aristas."""
-        # Eliminar todos los nodos
         while self.nodos:
             nodo = self.nodos.pop()
             nodo.eliminar(self.escena, self.aristas)
-
 
         self.aristas.clear()
         self.ui.tableview_mst.setModel(None)
