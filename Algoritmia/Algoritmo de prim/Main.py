@@ -9,44 +9,6 @@ from PySide6.QtGui import QPen, QBrush, QCursor, QFont, QPainter
 from PySide6.QtCore import Qt
 from ui_MainApp import Ui_MainWindow
 
-class ConectarNodosDialog(QtWidgets.QDialog):
-    def __init__(self, nombres_nodos, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Conectar Nodos")
-
-        # Campos de entrada
-        self.origen_combo = QtWidgets.QComboBox()
-        self.origen_combo.addItems(nombres_nodos)
-
-        self.destino_combo = QtWidgets.QComboBox()
-        self.destino_combo.addItems(nombres_nodos)
-        self.destino_combo.setCurrentIndex(1) 
-
-        self.peso_spinbox = QtWidgets.QSpinBox()
-        self.peso_spinbox.setRange(1, 100)
-        self.peso_spinbox.setValue(1)
-
-        # Layout
-        layout = QtWidgets.QFormLayout()
-        layout.addRow("Nodo de Origen:", self.origen_combo)
-        layout.addRow("Nodo de Destino:", self.destino_combo)
-        layout.addRow("Peso:", self.peso_spinbox)
-
-        # Botones
-        botones = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
-        botones.accepted.connect(self.accept)
-        botones.rejected.connect(self.reject)
-        layout.addWidget(botones)
-
-        self.setLayout(layout)
-
-    def get_result(self):
-        return (
-            self.origen_combo.currentText(),
-            self.destino_combo.currentText(),
-            self.peso_spinbox.value()
-        )
-
 class Arista(QGraphicsTextItem):
     def __init__(self, origen, destino, peso, escena):
         super().__init__()
@@ -80,45 +42,6 @@ class Arista(QGraphicsTextItem):
         self.escena.removeItem(self.linea)
         self.escena.removeItem(self)
 
-class Nodo(QGraphicsEllipseItem):
-    def __init__(self, x, y, nombre, escena):
-        super().__init__(-30, -30, 60, 60)
-        self.setBrush(QBrush(Qt.yellow))
-        self.setPen(QPen(Qt.black, 2))
-        self.setFlag(QGraphicsEllipseItem.GraphicsItemFlag.ItemIsMovable)
-        self.setFlag(QGraphicsEllipseItem.GraphicsItemFlag.ItemIsSelectable)
-        self.setZValue(1)
-        self.nombre = nombre
-        self.aristas = []
-
-        # Texto del nodo
-        self.texto = QGraphicsTextItem(nombre, self)
-        self.texto.setDefaultTextColor(Qt.black)
-        fuente = QFont("Arial", 14, QFont.Bold)
-        self.texto.setFont(fuente)
-        self.texto.setPos(-self.texto.boundingRect().width() / 2, -20)
-        escena.addItem(self)
-        self.setPos(x, y)
-
-    def add_arista(self, arista):
-        self.aristas.append(arista)
-
-    def eliminar_arista(self, arista):
-        if arista in self.aristas:
-            self.aristas.remove(arista)
-
-    def mouseMoveEvent(self, event):
-        """Actualizar las aristas conectadas al mover el nodo."""
-        super().mouseMoveEvent(event)
-        for arista in self.aristas:
-            arista.ajustar()
-
-    def eliminar(self, escena):
-        """Eliminar nodo y sus aristas asociadas."""
-        while self.aristas:
-            arista = self.aristas.pop()
-            arista.eliminar()
-        escena.removeItem(self)
 
 class Nodo(QtWidgets.QGraphicsEllipseItem):
     def __init__(self, x, y, nombre, escena):
@@ -159,6 +82,44 @@ class Nodo(QtWidgets.QGraphicsEllipseItem):
             arista = self.aristas.pop()
             arista.eliminar()
         escena.removeItem(self)
+
+class ConectarNodosDialog(QtWidgets.QDialog):
+    def __init__(self, nombres_nodos, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Conectar Nodos")
+
+        # Campos de entrada
+        self.origen_combo = QtWidgets.QComboBox()
+        self.origen_combo.addItems(nombres_nodos)
+
+        self.destino_combo = QtWidgets.QComboBox()
+        self.destino_combo.addItems(nombres_nodos)
+        self.destino_combo.setCurrentIndex(1) 
+
+        self.peso_spinbox = QtWidgets.QSpinBox()
+        self.peso_spinbox.setRange(1, 100)
+        self.peso_spinbox.setValue(1)
+
+        # Layout
+        layout = QtWidgets.QFormLayout()
+        layout.addRow("Nodo de Origen:", self.origen_combo)
+        layout.addRow("Nodo de Destino:", self.destino_combo)
+        layout.addRow("Peso:", self.peso_spinbox)
+
+        # Botones
+        botones = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        botones.accepted.connect(self.accept)
+        botones.rejected.connect(self.reject)
+        layout.addWidget(botones)
+
+        self.setLayout(layout)
+
+    def get_result(self):
+        return (
+            self.origen_combo.currentText(),
+            self.destino_combo.currentText(),
+            self.peso_spinbox.value()
+        )
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
