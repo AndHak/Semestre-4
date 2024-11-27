@@ -281,6 +281,6 @@ class Ui_MainWindow(object):
         self.label_desarrollado_por.setText(QCoreApplication.translate("MainWindow", u"Andres Felipe Martinez Guerra | Sebastian David Ordo\u00f1ez Bola\u00f1os", None))
         self.mst_label.setText(QCoreApplication.translate("MainWindow", u"M.S.T", None))
         self.costo_total_label.setText(QCoreApplication.translate("MainWindow", u"Costo Total:", None))
-        self.label_digitar_costo_total.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
+        self.label_digitar_costo_total.setText(QCoreApplication.translate("MainWindow", u" 0", None))
     # retranslateUi
 

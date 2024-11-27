@@ -3,54 +3,27 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QGraphicsView, QGraphicsScene,
     QPushButton, QVBoxLayout, QWidget, QGraphicsEllipseItem,
     QGraphicsTextItem, QInputDialog, QMessageBox, QTableWidget,
-    QTableWidgetItem
 )
-from PySide6.QtGui import QPen, QBrush, QCursor, QFont, QPainter
+from PySide6.QtGui import QPen, QBrush, QCursor, QFont, QPainter, QStandardItem, QStandardItemModel, QColor, QRadialGradient
 from PySide6.QtCore import Qt
 from ui_MainApp import Ui_MainWindow
-
-class Arista(QGraphicsTextItem):
-    def __init__(self, origen, destino, peso, escena):
-        super().__init__()
-        self.origen = origen
-        self.destino = destino
-        self.peso = peso
-
-        # Línea de la arista
-        self.linea = escena.addLine(0, 0, 0, 0, QPen(Qt.black, 2))
-        self.ajustar()
-
-        # Peso de la arista
-        self.setPlainText(str(peso))
-        self.setDefaultTextColor(Qt.black)
-        fuente = QFont("Arial", 12, QFont.Bold)
-        self.setFont(fuente)
-
-        self.escena = escena
-        self.escena.addItem(self)
-
-    def ajustar(self):
-        """Ajustar la línea y posición del peso según los nodos conectados."""
-        origen = self.origen.sceneBoundingRect().center()
-        destino = self.destino.sceneBoundingRect().center()
-        self.linea.setLine(origen.x(), origen.y(), destino.x(), destino.y())
-        punto_medio = self.linea.line().pointAt(0.5)
-        self.setPos(punto_medio.x(), punto_medio.y())
-
-    def eliminar(self):
-        """Eliminar la arista de la escena."""
-        self.escena.removeItem(self.linea)
-        self.escena.removeItem(self)
-
 
 class Nodo(QtWidgets.QGraphicsEllipseItem):
     def __init__(self, x, y, nombre, escena):
         super().__init__(-30, -30, 60, 60)
-        self.setBrush(QBrush(Qt.yellow))
+
+        # Estilo con degradado
+        gradiente = QRadialGradient(0, 0, 30)
+        gradiente.setColorAt(0, QColor(255, 255, 200))  # Color central claro
+        gradiente.setColorAt(1, QColor(255, 204, 102))  # Borde más oscuro
+        self.setBrush(QBrush(gradiente))
         self.setPen(QPen(Qt.black, 2))
+
+        # Movilidad y selección
         self.setFlag(QtWidgets.QGraphicsEllipseItem.GraphicsItemFlag.ItemIsMovable)
         self.setFlag(QtWidgets.QGraphicsEllipseItem.GraphicsItemFlag.ItemIsSelectable)
         self.setZValue(1)
+
         self.nombre = nombre
         self.aristas = []
 
@@ -60,6 +33,7 @@ class Nodo(QtWidgets.QGraphicsEllipseItem):
         fuente = QFont("Arial", 14, QFont.Bold)
         self.texto.setFont(fuente)
         self.texto.setPos(-self.texto.boundingRect().width() / 2, -20)
+
         escena.addItem(self)
         self.setPos(x, y)
 
@@ -83,36 +57,98 @@ class Nodo(QtWidgets.QGraphicsEllipseItem):
             arista.eliminar()
         escena.removeItem(self)
 
+
+class Arista(QGraphicsTextItem):
+    def __init__(self, origen, destino, peso, escena):
+        super().__init__()
+        self.origen = origen
+        self.destino = destino
+        self.peso = peso
+
+        # Línea de la arista
+        self.linea = escena.addLine(0, 0, 0, 0, QPen(Qt.darkGray, 2))
+        self.ajustar()
+
+        # Peso de la arista
+        self.setPlainText(str(peso))
+        self.setDefaultTextColor(Qt.darkBlue)
+        fuente = QFont("Arial", 10, QFont.Bold)
+        self.setFont(fuente)
+
+        self.escena = escena
+        self.escena.addItem(self)
+
+    def ajustar(self):
+        """Ajustar la línea y posición del peso según los nodos conectados."""
+        origen = self.origen.sceneBoundingRect().center()
+        destino = self.destino.sceneBoundingRect().center()
+        self.linea.setLine(origen.x(), origen.y(), destino.x(), destino.y())
+        punto_medio = self.linea.line().pointAt(0.5)
+        self.setPos(punto_medio.x(), punto_medio.y())
+
+    def eliminar(self):
+        """Eliminar la arista de la escena."""
+        self.escena.removeItem(self.linea)
+        self.escena.removeItem(self)
+
+
 class ConectarNodosDialog(QtWidgets.QDialog):
     def __init__(self, nombres_nodos, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Conectar Nodos")
 
         # Campos de entrada
+        layout = QtWidgets.QFormLayout()
+
         self.origen_combo = QtWidgets.QComboBox()
         self.origen_combo.addItems(nombres_nodos)
 
         self.destino_combo = QtWidgets.QComboBox()
         self.destino_combo.addItems(nombres_nodos)
-        self.destino_combo.setCurrentIndex(1) 
 
+        # Validación para evitar seleccionar el mismo nodo
+        self.origen_combo.currentIndexChanged.connect(self.actualizar_destino)
+        
         self.peso_spinbox = QtWidgets.QSpinBox()
-        self.peso_spinbox.setRange(1, 100)
+        self.peso_spinbox.setRange(1, 1000)  # Rango de peso más amplio
         self.peso_spinbox.setValue(1)
 
-        # Layout
-        layout = QtWidgets.QFormLayout()
         layout.addRow("Nodo de Origen:", self.origen_combo)
         layout.addRow("Nodo de Destino:", self.destino_combo)
         layout.addRow("Peso:", self.peso_spinbox)
 
         # Botones
-        botones = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        botones = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        )
         botones.accepted.connect(self.accept)
         botones.rejected.connect(self.reject)
         layout.addWidget(botones)
 
         self.setLayout(layout)
+        
+        # Inicializar combinación de destinos
+        self.actualizar_destino()
+
+    def actualizar_destino(self):
+        # Deshabilitar el nodo de origen en la lista de destino
+        origen_actual = self.origen_combo.currentText()
+        
+        # Guardar el destino actual
+        destino_actual = self.destino_combo.currentText()
+        
+        # Limpiar y repoblar el combo de destino
+        self.destino_combo.clear()
+        destinos_disponibles = [
+            nodo for nodo in [self.origen_combo.itemText(i) for i in range(self.origen_combo.count())] 
+            if nodo != origen_actual
+        ]
+        self.destino_combo.addItems(destinos_disponibles)
+        
+        # Intentar mantener el destino anterior si está disponible
+        index = self.destino_combo.findText(destino_actual)
+        if index != -1:
+            self.destino_combo.setCurrentIndex(index)
 
     def get_result(self):
         return (
@@ -120,6 +156,7 @@ class ConectarNodosDialog(QtWidgets.QDialog):
             self.destino_combo.currentText(),
             self.peso_spinbox.value()
         )
+
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -165,10 +202,51 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.calcular_mst_button.clicked.connect(self.calcular_mst)
 
     def modo_eliminar_enlace(self):
-        pass
+        """Eliminar un enlace específico entre dos nodos."""
+        # Primero, verificar si hay aristas
+        if not self.aristas:
+            QMessageBox.information(self, "Error", "No hay enlaces para eliminar.")
+            return
+
+        # Crear lista de enlaces para mostrar
+        enlaces = [f"{arista.origen.nombre} --> {arista.destino.nombre} (Peso: {arista.peso})" for arista in self.aristas]
+        
+        # Mostrar diálogo de selección de enlace
+        enlace_seleccionado, ok = QInputDialog.getItem(
+            self, 
+            "Eliminar Enlace", 
+            "Seleccione el enlace a eliminar:", 
+            enlaces, 
+            editable=False
+        )
+
+        if ok and enlace_seleccionado:
+            # Encontrar la arista correspondiente
+            for arista in self.aristas[:]:  # Copia de lista para seguridad al modificar
+                if (f"{arista.origen.nombre} -> {arista.destino.nombre} (Peso: {arista.peso})" == enlace_seleccionado):
+                    # Eliminar la arista de los nodos
+                    arista.origen.eliminar_arista(arista)
+                    arista.destino.eliminar_arista(arista)
+                    
+                    # Eliminar la arista de la escena
+                    arista.eliminar()
+                    
+                    # Eliminar de la lista de aristas
+                    self.aristas.remove(arista)
+                    
+                    break
 
     def eliminar_todo(self):
-        pass
+        """Eliminar todos los nodos y aristas."""
+        # Eliminar todos los nodos
+        while self.nodos:
+            nodo = self.nodos.pop()
+            nodo.eliminar(self.escena)
+
+
+        self.aristas.clear()
+        self.ui.tableview_mst.setModel(None)
+        self.ui.label_digitar_costo_total.setText(" 0")
 
 
     def modo_agregar_nodo(self):
@@ -185,6 +263,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def modo_eliminar_nodo(self):
         """Eliminar un nodo seleccionado."""
+        if not self.nodos:
+            QMessageBox.information(self, "Error", "No hay nodos para eliminar.")
+            return
+
         nombres_nodos = [nodo.nombre for nodo in self.nodos]
         nombre, ok = QInputDialog.getItem(self, "Eliminar Nodo", "Seleccione un Nodo:", nombres_nodos, editable=False)
 
@@ -195,29 +277,38 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def modo_conectar_nodo(self):
         """Conectar dos nodos."""
+        if len(self.nodos) < 2:
+            QMessageBox.information(self, "Error", "Debe tener al menos 2 nodos para crear una conexión.")
+            return
+
         nombres_nodos = [nodo.nombre for nodo in self.nodos]
-        origen_nombre, ok = QInputDialog.getItem(self, "Conectar Nodos", "Nodo de Origen:", nombres_nodos, editable=False)
-        if not ok:
-            return
-        destino_nombre, ok = QInputDialog.getItem(self, "Conectar Nodos", "Nodo de Destino:", nombres_nodos, editable=False)
-        if not ok:
-            return
-        peso, ok = QInputDialog.getInt(self, "Peso de la Arista", "Ingrese el peso:")
-        if not ok:
-            return
+        dialogo = ConectarNodosDialog(nombres_nodos, self)
 
-        origen = next(n for n in self.nodos if n.nombre == origen_nombre)
-        destino = next(n for n in self.nodos if n.nombre == destino_nombre)
+        if dialogo.exec() == QtWidgets.QDialog.Accepted:
+            origen_nombre, destino_nombre, peso = dialogo.get_result()
 
-        arista = Arista(origen, destino, peso, self.escena)
-        self.aristas.append(arista)
-        origen.add_arista(arista)
-        destino.add_arista(arista)
+            # Comprobar si ya existe un enlace entre los nodos
+            if any(
+                (arista.origen.nombre == origen_nombre and arista.destino.nombre == destino_nombre) or
+                (arista.origen.nombre == destino_nombre and arista.destino.nombre == origen_nombre)
+                for arista in self.aristas
+            ):
+                QMessageBox.warning(self, "Error", "Ya existe un enlace entre estos nodos.")
+                return
+
+            origen = next(n for n in self.nodos if n.nombre == origen_nombre)
+            destino = next(n for n in self.nodos if n.nombre == destino_nombre)
+
+            arista = Arista(origen, destino, peso, self.escena)
+            self.aristas.append(arista)
+            origen.add_arista(arista)
+            destino.add_arista(arista)
+
 
     def calcular_mst(self):
-        """Calcular el MST con el algoritmo de Prim y mostrar la tabla de resultados."""
+        """Calcular el MST con el algoritmo de Prim."""
         if not self.nodos or not self.aristas:
-            QMessageBox.warning(self, "Error", "No hay nodos o aristas en el grafo.")
+            QMessageBox.information(self, "Error", "No hay nodos o aristas en el grafo.")
             return
 
         nombres_nodos = [nodo.nombre for nodo in self.nodos]
@@ -245,8 +336,41 @@ class MainWindow(QtWidgets.QMainWindow):
                     if arista.destino not in visitados or arista.origen not in visitados:
                         aristas_posibles.append(arista)
 
-        # Mostrar tabla con nodos y costos
+        # Restablecer colores de aristas
+        for arista in self.aristas:
+            arista.linea.setPen(QPen(Qt.black, 2))
+
+        # Marcar aristas del MST en rojo
+        for arista in mst_aristas:
+            arista.linea.setPen(QPen(Qt.red, 3))
+
+        # Mostrar resultados en la tabla
         self.mostrar_resultados_mst(mst_aristas, total_costo)
+
+    from PySide6.QtGui import QStandardItemModel, QStandardItem
+
+    def mostrar_resultados_mst(self, mst_aristas, total_costo): 
+        """Mostrar resultados del MST en la tabla."""
+        # Crear un modelo de tabla estándar
+        modelo = QStandardItemModel(len(mst_aristas), 3)
+        
+        # Configurar encabezados de columnas
+        modelo.setHorizontalHeaderLabels(["Origen", "Destino", "Peso"])
+        
+        # Llenar el modelo
+        for fila, arista in enumerate(mst_aristas):
+            modelo.setItem(fila, 0, QStandardItem(arista.origen.nombre))
+            modelo.setItem(fila, 1, QStandardItem(arista.destino.nombre))
+            modelo.setItem(fila, 2, QStandardItem(str(arista.peso)))
+        
+        # Asignar el modelo al TableView
+        self.ui.tableview_mst.setModel(modelo)
+        
+        # Ajustar columnas al contenido
+        self.ui.tableview_mst.resizeColumnsToContents()
+        
+        # Mostrar costo total
+        self.ui.label_digitar_costo_total.setText(f" {total_costo}")
 
 
 def main():
