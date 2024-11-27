@@ -120,7 +120,7 @@ class ConectarNodosDialog(QtWidgets.QDialog):
         self.origen_combo.currentIndexChanged.connect(self.actualizar_destino)
         
         self.peso_spinbox = QtWidgets.QSpinBox()
-        self.peso_spinbox.setRange(1, 1000)  # Rango de peso más amplio
+        self.peso_spinbox.setRange(1, 1000) 
         self.peso_spinbox.setValue(1)
 
         layout.addRow("Nodo de Origen:", self.origen_combo)
@@ -151,7 +151,7 @@ class ConectarNodosDialog(QtWidgets.QDialog):
         self.destino_combo.clear()
         destinos_disponibles = [
             nodo for nodo in [self.origen_combo.itemText(i) for i in range(self.origen_combo.count())] 
-            if nodo != origen_actual
+            if nodo != origen_actual 
         ]
         self.destino_combo.addItems(destinos_disponibles)
         
@@ -252,7 +252,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Eliminar todos los nodos
         while self.nodos:
             nodo = self.nodos.pop()
-            nodo.eliminar(self.escena)
+            nodo.eliminar(self.escena, self.aristas)
 
 
         self.aristas.clear()
@@ -266,11 +266,16 @@ class MainWindow(QtWidgets.QMainWindow):
         if ok and nombre:
             if any(nodo.nombre == nombre for nodo in self.nodos):
                 QMessageBox.warning(self, "Error", "Ya existe un nodo con ese nombre.")
-                return  # Evitar duplicados
+                return
+        
+            if nombre.strip() == "":
+                QMessageBox.warning(self, "Error", "Digite un nombre.")
+                return
 
             posicion = self.vista.mapToScene(self.vista.mapFromGlobal(QCursor.pos()))
             nodo = Nodo(posicion.x(), posicion.y(), nombre, self.escena)
             self.nodos.append(nodo)
+
 
     def modo_eliminar_nodo(self):
         """Eliminar un nodo seleccionado."""
